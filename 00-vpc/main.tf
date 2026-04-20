@@ -1,4 +1,4 @@
-module "iam_account" {
+module "vpc" {
   source  = "git::https://github.com/vikasarisela/Terraform-vpc-module.git?ref=main"
   # VPC
     cidr_block = var.vpc_cidr
