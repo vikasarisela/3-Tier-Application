@@ -4,3 +4,6 @@ resource "aws_ssm_parameter" "sg_id" {
   type  = "String"
   value = module.sg[count.index].sg_id
 }
+
+
+
