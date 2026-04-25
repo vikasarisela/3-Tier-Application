@@ -102,6 +102,7 @@ resource "aws_instance" "rabbitmq" {
   )
 }
 
+
 resource "terraform_data" "rabbitmq" {
   triggers_replace = [
     aws_instance.rabbitmq.id   # triggers when mongodb instance id changes 
@@ -129,6 +130,11 @@ resource "terraform_data" "rabbitmq" {
   
 }
 
+# First terraform apply →
+# EC2 instance is created → then terraform_data runs
+# → copies bootstrap.sh → executes it on the instance
+# If EC2 is recreated (new ID) →
+# triggers_replace detects change → terraform_data runs again
 
 
 # mysql
@@ -147,6 +153,10 @@ resource "aws_instance" "mysql" {
     }
   )
 }
+
+# “Trigger runs the first time when the ID is created, and again whenever the ID changes (like when the instance is recreated).”
+# terraform_data = container to run provisioners
+# triggers_replace = condition that forces it to run again
 
 resource "terraform_data" "mysql" {
   triggers_replace = [
