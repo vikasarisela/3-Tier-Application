@@ -155,16 +155,19 @@ resource "aws_instance" "mysql" {
   )
 }
 
-<<<<<<< HEAD
-# “Trigger runs the first time when the ID is created, and again whenever the ID changes (like when the instance is recreated).”
-# terraform_data = container to run provisioners
-# triggers_replace = condition that forces it to run again
-=======
+# It creates a bridge between EC2 and an IAM role
+# i created manually already in aws console  EC2SSMParameterRead role with policy attached 
+# fetched in ansible mysql 
+
 resource "aws_iam_instance_profile" "mysql" {
   name = "mysql"
   role = "EC2SSMParameterRead"
 }
->>>>>>> a25872e (local changes from PC)
+
+
+# “Trigger runs the first time when the ID is created, and again whenever the ID changes (like when the instance is recreated).”
+# terraform_data = container to run provisioners
+# triggers_replace = condition that forces it to run again
 
 resource "terraform_data" "mysql" {
   triggers_replace = [
