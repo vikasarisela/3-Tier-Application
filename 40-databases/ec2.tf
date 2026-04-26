@@ -145,6 +145,7 @@ resource "aws_instance" "mysql" {
     instance_type = "t3.micro"
     vpc_security_group_ids = [local.mysql_sg_id]
     subnet_id = local.subnet_id
+    iam_instance_profile = aws_iam_instance_profile.mysql.name
       tags = merge(
     
     local.common_tags,
@@ -154,9 +155,16 @@ resource "aws_instance" "mysql" {
   )
 }
 
+<<<<<<< HEAD
 # “Trigger runs the first time when the ID is created, and again whenever the ID changes (like when the instance is recreated).”
 # terraform_data = container to run provisioners
 # triggers_replace = condition that forces it to run again
+=======
+resource "aws_iam_instance_profile" "mysql" {
+  name = "mysql"
+  role = "EC2SSMParameterRead"
+}
+>>>>>>> a25872e (local changes from PC)
 
 resource "terraform_data" "mysql" {
   triggers_replace = [
@@ -179,7 +187,7 @@ resource "terraform_data" "mysql" {
   provisioner "remote-exec" {
     inline = [
         "chmod +x /tmp/bootstrap.sh",  # execute access 
-        "sudo sh /tmp/bootstrap.sh mysql"    # runs booststrap.sh    
+        "sudo sh /tmp/bootstrap.sh mysql dev"    # runs booststrap.sh    
     ]
   }
   
