@@ -201,7 +201,7 @@ resource "terraform_data" "mysql" {
 
 
 resource "aws_route53_record" "mongodb" {
-  zone_id = aws_route53_zone.cloudskills.zone_id
+  zone_id = data.aws_route53_zone.cloudskills.zone_id
   name    = "cloudskills.fun"
   type    = "A"
   ttl     = 300
