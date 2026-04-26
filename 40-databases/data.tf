@@ -56,5 +56,5 @@ data "aws_route53_zone" "cloudskills" {
 }
 
 output "zone_id" {
- value =  aws_route53_zone.cloudskills.zone_id
+ value =  data.aws_route53_zone.cloudskills.zone_id
 }
