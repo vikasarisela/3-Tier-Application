@@ -12,6 +12,6 @@ locals {
    mysql_sg_id = data.aws_ssm_parameter.mysql_sg_id.value
 
 
-   subnet_id = split("," , data.aws_ssm_parameter.private_subnet_ids.value)[0]
+   subnet_id = split("," , data.aws_ssm_parameter.database_subnet_ids.value)[0]
 
 }
