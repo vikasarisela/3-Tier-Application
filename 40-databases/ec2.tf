@@ -198,3 +198,12 @@ resource "terraform_data" "mysql" {
   }
   
 }
+
+
+resource "aws_route53_record" "mongodb" {
+  zone_id = aws_route53_zone.cloudskills.zone_id
+  name    = "cloudskills.fun"
+  type    = "A"
+  ttl     = 300
+  records = [aws_instance.mongodb.private_ip]
+}
