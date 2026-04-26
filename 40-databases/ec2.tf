@@ -42,6 +42,8 @@ resource "terraform_data" "mongodb" {
 
 
 
+# redis 
+
 resource "aws_instance" "redis" {
     ami = data.aws_ami.ami_data.id
 
@@ -57,9 +59,10 @@ resource "aws_instance" "redis" {
   )
 }
 
+# 👉 Used to run scripts on the EC2 after creation
 resource "terraform_data" "redis" {
   triggers_replace = [
-    aws_instance.redis.id   # triggers when mongodb instance id changes 
+    aws_instance.redis.id   # 👉 If EC2 is recreated → run setup again 
     
   ]
   connection {
