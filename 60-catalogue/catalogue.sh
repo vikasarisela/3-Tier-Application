@@ -5,7 +5,7 @@ environment=$2
 dnf install ansible -y 
 # ansible-pull -U https://github.com/vikasarisela/Ansible-Roles-Roboshop-tf.git -e component=$component main.yaml
 
-REPO_URL=https://github.com/vikasarisela/Ansible-Roles-Roboshop-tf.git
+REPO_URL=https://github.com/vikasarisela/Ansible-Roles-tf.git
 REPO_DIR=/opt/roboshop/ansible
 ANSIBLE_DIR=Ansible-Roles-Roboshop-tf
 
