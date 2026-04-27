@@ -199,7 +199,7 @@ resource "terraform_data" "mysql" {
   
 }
 
-
+#route53 records for databases
 resource "aws_route53_record" "mongodb" {
   zone_id = data.aws_route53_zone.cloudskills.zone_id
   name    = "mongodb-${var.environment}.${var.domain_name}"
