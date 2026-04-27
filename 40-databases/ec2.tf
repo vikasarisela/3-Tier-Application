@@ -133,18 +133,21 @@ resource "terraform_data" "rabbitmq" {
   
 }
 
-# # First terraform apply →
-# # EC2 instance is created → then terraform_data runs
-# # → copies bootstrap.sh → executes it on the instance
-# # If EC2 is recreated (new ID) →
-# # triggers_replace detects change → terraform_data runs again
+resource "aws_instance" "mysql" {
+    ami = data.aws_ami.ami_data.id
 
+    instance_type = "t3.micro"
+    vpc_security_group_ids = [local.mysql_sg_id]
+    subnet_id = local.subnet_id
+      tags = merge(
+    
+    local.common_tags,
+    {
+        Name = "${local.common_suffix}-mysql" # roboshop-dev-catalogue
+    }
+  )
+}
 
-
-
-# # “Trigger runs the first time when the ID is created, and again whenever the ID changes (like when the instance is recreated).”
-# # terraform_data = container to run provisioners
-# # triggers_replace = condition that forces it to run again
 
 resource "terraform_data" "mysql" {
   triggers_replace = [
