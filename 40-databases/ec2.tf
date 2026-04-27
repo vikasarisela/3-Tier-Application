@@ -207,8 +207,15 @@ resource "terraform_data" "mongodb" {
 #   ttl     = 1
 #   records = [aws_instance.mongodb.private_ip]
 #   allow_overwrite = true
-
-# }
+#route53 records for databases
+# resource "aws_route53_record" "mongodb" {
+#   zone_id = data.aws_route53_zone.cloudskills.zone_id
+#   name    = "mongodb-${var.environment}.${var.domain_name}"
+#   type    = "A"
+#   ttl     = 1
+#   records = [aws_instance.mongodb.private_ip]
+#   allow_overwrite = true
+#  }
 
 # resource "aws_route53_record" "redis" {
 #   zone_id = data.aws_route53_zone.cloudskills.zone_id
