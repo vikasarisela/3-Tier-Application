@@ -1,4 +1,5 @@
 
+# backend alb accepting connection from bation on port 80
 resource "aws_security_group_rule" "backend_alb_bastion" {
   type              = "ingress"
   security_group_id = local.backend_alb_sg_id
@@ -65,6 +66,7 @@ resource "aws_security_group_rule" "catalogue_bastion" {
   to_port           = 22
 }
 
+# mongodb opened 27017 pport accepting connections from catalogue 
 resource "aws_security_group_rule" "mongodb_catalogue" {
   type              = "ingress"
   security_group_id = local.mongodb_sg_id
