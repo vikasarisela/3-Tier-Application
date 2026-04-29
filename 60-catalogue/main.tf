@@ -45,3 +45,13 @@ resource "terraform_data" "catalogue" {
   
 }
 
+
+resource "aws_lb_target_group" "test" {
+  name     = "${local.common_suffix}-catalogue"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = data.aws_ssm_parameter.vpc_id.value
+  health_check {
+    
+  }
+}
