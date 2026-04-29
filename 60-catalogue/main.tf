@@ -46,12 +46,83 @@ resource "terraform_data" "catalogue" {
 }
 
 
-resource "aws_lb_target_group" "test" {
+resource "aws_ec2_instance_state" "catalogue" {
+  
+}
+
+resource "aws_lb_target_group" "catalogue" {
   name     = "${local.common_suffix}-catalogue"
   port     = 8080
   protocol = "HTTP"
   vpc_id   = data.aws_ssm_parameter.vpc_id.value
   health_check {
-    
+    healthy_threshold = 2
+    interval = 10
+    matcher = "200-299"
+    path = "/health"
+    port = 8080
+    protocol = "HTTP"
+    timeout = 2
+    unhealthy_threshold = 2   
   }
+}
+resource "aws_launch_template" "catalogue" {
+  name = "${local.common_suffix}-catalogue"
+
+  
+
+    image_id = aws_ami_from
+
+  instance_initiated_shutdown_behavior = "terminate"
+
+  instance_market_options {
+    market_type = "spot"
+  }
+
+  instance_type = "t2.micro"
+
+  kernel_id = "test"
+
+  key_name = "test"
+
+  license_specification {
+    license_configuration_arn = "arn:aws:license-manager:eu-west-1:123456789012:license-configuration:lic-0123456789abcdef0123456789abcdef"
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+    instance_metadata_tags      = "enabled"
+  }
+
+  monitoring {
+    enabled = true
+  }
+
+  network_performance_options {
+    bandwidth_weighting = "vpc-1"
+  }
+
+  network_interfaces {
+    associate_public_ip_address = true
+  }
+
+  placement {
+    availability_zone = "us-west-2a"
+  }
+
+  ram_disk_id = "test"
+
+  vpc_security_group_ids = ["sg-12345678"]
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "test"
+    }
+  }
+
+  user_data = filebase64("${path.module}/example.sh")
 }
