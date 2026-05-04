@@ -3,7 +3,7 @@ resource "aws_instance" "catalogue" {
 
     instance_type = "t3.micro"
     vpc_security_group_ids = [local.catalogue_sg_id]
-    subnet_id = local.subnet_id
+    subnet_id = local.private_subnet_id
       tags = merge(
     
     local.common_tags,
@@ -77,19 +77,16 @@ resource "aws_lb_target_group" "catalogue" {
   }
 }
 
-
-
-
 resource "aws_launch_template" "catalogue" {
   name = "${local.common_suffix}-catalogue"
   image_id = aws_ami_from_instance.catalogue.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type = "t3.micro"
   vpc_security_group_ids = [local.catalogue_sg_id]
-
+   
+  # tags attached to the instances   
   tag_specifications {
     resource_type = "instance"
-
     tags = merge( 
     local.common_tags,
     {
@@ -98,23 +95,91 @@ resource "aws_launch_template" "catalogue" {
   )
   }
 
-  user_data = filebase64("${path.module}/example.sh")
-  instance_id = aws_instance.catalogue.id
-  state       = "stopped"
-    depends_on = [terraform_data.catalogue]
-}
-
-# generating catalogue ami 
-resource "aws_ami_from_instance" "catalogue" {
-  name               = "${local.common_suffix}-catalogue-ami"
-  source_instance_id = aws_ec2_instance_state.catalogue.id
-  depends_on = [aws_ec2_instance_state.catalogue]
-
-  tags = merge(
-    
+ # tags attached to the volume created by instance 
+ tag_specifications {
+    resource_type = "volume"
+    tags = merge( 
     local.common_tags,
     {
-        Name = "${local.common_suffix}-catalogue-ami" # roboshop-dev-catalogue
+        Name = "${local.common_suffix}-catalogue" # roboshop-dev-catalogue
     }
   )
+  }
+
+ #tags attached to the launch template 
+ tags = merge( 
+    local.common_tags,
+    {
+        Name = "${local.common_suffix}-catalogue" # roboshop-dev-catalogue
+    }
+  )
+ }
+
+# generating catalogue ami 
+
+resource "aws_autoscaling_group" "bar" {
+  name                      = "${local.common_suffix}-catalogue"
+  max_size                  = 10
+  min_size                  = 1
+  #after 100 secs health check should be done
+  health_check_grace_period = 100
+  health_check_type         = "ELB"
+  desired_capacity          = 1
+  force_delete              = false
+  placement_group           = aws_placement_group.test.id
+   launch_template {
+    id      = aws_launch_template.catalogue.id
+    version = "$Latest"
+  }
+  vpc_zone_identifier       = local.private_subnet_ids
+  target_group_arns = [aws_lb_target_group]
+ 
+  dynamic "tag" {  # we will get the iterator with name as tag
+    for_each = merge(
+      local.common_tags,
+      {
+        Name = "${local.common_suffix}-catalogue"
+      }
+    )
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
+
+  timeouts {
+    delete = "15m"
+  }
+}
+
+resource "aws_autoscaling_policy" "catalogue" {
+  autoscaling_group_name = aws_autoscaling_group.catalogue.name
+  name                   = "${llocal.common_suffix}-catalogue"
+  policy_type            = "TargetTrackingScaling"
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+
+    target_value = 75.0
+  }
+}
+
+resource "aws_lb_listener_rule" "backend_alb" {
+  listener_arn = local.backend_alb_listener_arn
+  priority     = 10
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.catalogue.arn
+  }
+
+  
+  condition {
+    host_header {
+      values = ["catalogue.backend-alb-${var.environment}.${var.domain_name}"]
+    }
+  }
 }

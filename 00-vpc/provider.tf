@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket = "terraform-vik"
-    key    = "3-Tier-Application"
+    key    = "3-Tier-Application-vpc"
     region = "us-east-1"
     use_lockfile = true
     encrypt = true

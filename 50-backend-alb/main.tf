@@ -12,7 +12,7 @@ resource "aws_lb" "backend_lb" {
   }
 }
 
-resource "aws_lb_listener" "front_end" {
+resource "aws_lb_listener" "backend_alb" {
   load_balancer_arn = aws_lb.backend_lb.arn
   port              = "80"
   protocol          = "HTTP"
@@ -27,3 +27,23 @@ resource "aws_lb_listener" "front_end" {
     }
   }
 }
+
+# rule written in listener if user hits catalogue.backend-alb-dev-cloudksills.fun then request should go to catalogue target group
+
+# Terraform code makes all subdomains automatically point to your load balancer without using IP addresses
+resource "aws_route53_record" "backend_alb" {
+  zone_id = data.aws_route53_zone.cloudskills.zone_id
+  name    = "*.backend-alb-${var.environment}.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.backend_lb.dns_name
+    zone_id                = aws_lb.backend_lb.zone_ids
+    evaluate_target_health = true
+  }
+}
+
+# When users type mywebsite.com
+# DNS automatically points to myapp-123456.elb.amazonaws.com
+
+
