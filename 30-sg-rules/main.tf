@@ -11,7 +11,7 @@ resource "aws_security_group_rule" "backend_alb_bastion" {
 
 
 # database subnet rules
-
+# opening port for bastion from internet 
 resource "aws_security_group_rule" "bastion_laptop" {
   type              = "ingress"
   security_group_id = local.bastion_sg_id
@@ -21,6 +21,7 @@ resource "aws_security_group_rule" "bastion_laptop" {
   to_port           = 22
 }
 
+# mongodb listening on port 22 from bastion sg 
 resource "aws_security_group_rule" "mongodb_bastion" {
   type              = "ingress"
   security_group_id = local.mongodb_sg_id

@@ -116,9 +116,8 @@ resource "aws_launch_template" "catalogue" {
   )
  }
 
-# generating catalogue ami 
 
-resource "aws_autoscaling_group" "bar" {
+resource "aws_autoscaling_group" "catalogue" {
   name                      = "${local.common_suffix}-catalogue"
   max_size                  = 10
   min_size                  = 1
@@ -127,13 +126,12 @@ resource "aws_autoscaling_group" "bar" {
   health_check_type         = "ELB"
   desired_capacity          = 1
   force_delete              = false
-  placement_group           = aws_placement_group.test.id
    launch_template {
     id      = aws_launch_template.catalogue.id
-    version = "$Latest"
+    version = aws_launch_template.catalogue.latest_version
   }
   vpc_zone_identifier       = local.private_subnet_ids
-  target_group_arns = [aws_lb_target_group]
+  target_group_arns = [aws_lb_target_group.catalogue.arn]
  
   dynamic "tag" {  # we will get the iterator with name as tag
     for_each = merge(
