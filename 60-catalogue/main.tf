@@ -84,6 +84,7 @@ resource "aws_launch_template" "catalogue" {
   instance_type = "t3.micro"
   vpc_security_group_ids = [local.catalogue_sg_id]
   # when we run terraform apply again, a new version will be created with new AMI ID
+  # no need to create aws_launch template again here 
   update_default_version = true
   # tags attached to the instances   
   tag_specifications {
@@ -128,10 +129,19 @@ resource "aws_autoscaling_group" "catalogue" {
   force_delete              = false
    launch_template {
     id      = aws_launch_template.catalogue.id
+    # ASG with referesh with latest version of launch template 
     version = aws_launch_template.catalogue.latest_version
   }
   vpc_zone_identifier       = local.private_subnet_ids
   target_group_arns = [aws_lb_target_group.catalogue.arn]
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50 # atleast 50% of the instances should be up and running
+    }
+    triggers = ["launch_template"]   # when launch template changes it triggers 
+  }
  
   dynamic "tag" {  # we will get the iterator with name as tag
     for_each = merge(
@@ -166,19 +176,31 @@ resource "aws_autoscaling_policy" "catalogue" {
   }
 }
 
-resource "aws_lb_listener_rule" "backend_alb" {
+# adding rule to backend ALB
+
+resource "aws_lb_listener_rule" "catalogue" {
   listener_arn = local.backend_alb_listener_arn
   priority     = 10
+
+   condition {
+    host_header {
+      values = ["catalogue.backend-alb-${var.environment}.${var.domain_name}"]
+    }
+  }
 
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.catalogue.arn
   }
+}
 
+resource "terraform_data" "catalogue_local" {
+  triggers_replace = [
+    aws_instance.catalogue.id
+  ]
   
-  condition {
-    host_header {
-      values = ["catalogue.backend-alb-${var.environment}.${var.domain_name}"]
-    }
+  depends_on = [aws_autoscaling_policy.catalogue]
+  provisioner "local-exec" {
+    command = "aws ec2 terminate-instances --instance-ids ${aws_instance.catalogue.id}"
   }
 }

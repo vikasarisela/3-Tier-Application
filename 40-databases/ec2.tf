@@ -149,6 +149,7 @@ resource "aws_instance" "mysql" {
   )
 }
 
+# this resource creates the IAM Instance Profile, which is the object used to attach an IAM role to an EC2 instance.
 resource "aws_iam_instance_profile" "mysql" {
   name = "mysql"
   role = "EC2SSMParameterRead"
