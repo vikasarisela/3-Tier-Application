@@ -11,6 +11,8 @@ data "aws_ssm_parameter" "private_subnet_ids" {
   name = "/${var.project_name}/${var.environment}/private_subnet_ids"
 }
 
+
+# fetches zone id 
 data "aws_route53_zone" "cloudskills" {
   name         = "cloudskills.fun"
   private_zone = false

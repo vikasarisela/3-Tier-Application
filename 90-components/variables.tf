@@ -1,0 +1,3 @@
+variable "component" {
+  default = "catalogue"
+}
