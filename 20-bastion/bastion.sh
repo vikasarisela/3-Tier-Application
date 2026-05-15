@@ -12,10 +12,10 @@ sudo yum -y install terraform
 
 # sudo lvreduce -r -L 6G /dev/mapper/RootVG-rootVol
 
-# creating databases
-# cd /home/ec2-user
-# git clone https://github.com/daws-86s/roboshop-dev-infra.git
-# chown ec2-user:ec2-user -R roboshop-dev-infra
-# cd roboshop-dev-infra/40-databases
-# terraform init
-# terraform apply -auto-approve
+creating databases
+cd /home/ec2-user
+git clone https://github.com/vikasarisela/3-Tier-Application.git
+chown ec2-user:ec2-user -R 3-Tier-Application
+cd 3-Tier-Application/40-databases
+terraform init
+terraform apply -auto-approve
