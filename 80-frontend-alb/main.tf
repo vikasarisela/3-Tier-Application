@@ -1,5 +1,5 @@
-resource "aws_lb" "backend_lb" {
-  name               = "${local.common_suffix}-backend-alb"
+resource "aws_lb" "frontend_lb" {
+  name               = "${local.common_suffix}-frontend-lb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [local.frontend_alb_sg_id]
@@ -11,7 +11,7 @@ resource "aws_lb" "backend_lb" {
     
     local.common_tags,
     {
-        Name = "${local.common_suffix}-frontend-alb" # roboshop-dev-catalogue
+        Name = "${local.common_suffix}-frontend-lb" # roboshop-dev-catalogue
     }
   )
 }
@@ -29,7 +29,7 @@ resource "aws_lb_listener" "front_end" {
 
     fixed_response {
       content_type = "text/plain"
-      message_body = "Hi, i am from https frontend alb"
+      message_body = "Hi, i am from https frontend lb"
       status_code  = "200"
     }
   }

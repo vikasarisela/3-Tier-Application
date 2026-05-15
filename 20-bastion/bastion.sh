@@ -12,7 +12,7 @@ sudo yum -y install terraform
 
 # sudo lvreduce -r -L 6G /dev/mapper/RootVG-rootVol
 
-creating databases
+# creating databases
 cd /home/ec2-user
 git clone https://github.com/vikasarisela/3-Tier-Application.git
 chown ec2-user:ec2-user -R 3-Tier-Application
