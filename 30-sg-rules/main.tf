@@ -309,6 +309,18 @@ resource "aws_security_group_rule" "open_vpn_1194" {
   to_port           = 1194
 }
 
+resource "aws_security_group_rule" "catalgoue_laptop_8080" {
+  type              = "ingress"
+  security_group_id = local.catalogue_sg_id
+  source_security_group_id = local.open_vpn_sg_id
+  from_port         = 8080
+  protocol          = "tcp"
+  to_port           = 8080
+}
+
+
+
+
 # this is the mistake cart cant access components from one component to another component they should communicate through backend LB
 # resource "aws_security_group_rule" "catagloue_cart" {
 #   type              = "ingress"
